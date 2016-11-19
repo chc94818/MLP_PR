@@ -17,7 +17,7 @@ namespace MLP_PR
             trainData = fc.trainDataRead();//讀取訓練資料
             //printList(trainData);//印出訓練資料
             MLP pr = new MLP(new int[] { 100, 8 },100, learn);
-            for(int i = 0; i < 200; i++)
+            for(int i = 0; i < 100; i++)
             {
                 pr.Train(trainData);
             }
