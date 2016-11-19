@@ -33,7 +33,7 @@ namespace MLP_PR
         {
             return delta;
         }
-        //WEIGHT初始化--------------------------------------------------------------------------
+        //WEIGHT初始化，無WEIGHT DATA，RANDOM初始化---------------------------------------------
         public void weightInit(int weightNum, double learn)
         {
             Random random = new Random();//初始化RANDOM
@@ -44,6 +44,20 @@ namespace MLP_PR
             for (int i = 0; i < weight.Length; i++)
             {
                 weight[i] = random.NextDouble()*2-1;
+            }
+        }
+        //--------------------------------------------------------------------------------------
+        //WEIGHT初始化，有WEIGHT DATA，直接存入WEIGHT DATA----------------------------------------
+        public void weightInit(int weightNum, double learn, double[] weightData)
+        {
+            Random random = new Random();//初始化RANDOM
+            weightDelta = new double[weightNum];//初始化weightDelta
+            weight = new double[weightNum];//初始化weight
+            this.learn = learn;
+            //逐個初始weight的權重
+            for (int i = 0; i < weight.Length; i++)
+            {
+                weight[i] = weightData[i];
             }
         }
         //--------------------------------------------------------------------------------------

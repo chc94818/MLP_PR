@@ -8,47 +8,36 @@ namespace MLP_PR
     //多層類神經感知機
     class MLP
     {
-        //宣告-----------------------------------------------------------------------------------------------
-        double[,] vT;
-        double learn;
-        double convergence;
-        double[,] dataTrain;
-        double[,] dataTest;
-        double[] weight;
-        double maxD;
-        double minD;
-        double testl = 0.5;
-        double testc = 0.001;
-        double maxTemp;
-        double minTemp;
-        double reguTemp;
-        double reguNu;
-        double[,] data;
-        double rmse;
-
+        //宣告-----------------------------------------------------------------------------------------------        
+        double rmse;//方差
+        fileControl fc = new fileControl();//建立fileControl來進行檔案操作
         double sum; //計算資料筆數
         double hit; //命中資料筆數
         double hitRate;//命中率
+        double learn;//學習率
+        List<double[]> weightData = new List<double[]>();//每一個神經元的權重
         List<Perceptron[]> mlp = new List<Perceptron[]>();//多層類神經網路LIST mlp[0] = 輸入層 mlp[n] = 第n層
         //--------------------------------------------------------------------------------------------------
         //MLP CONSTRUCT-------------------------------------------------------------------------------------
         //int[] layer 表示隱藏層跟輸出層的神經元個數
         public MLP(int[] layer,int dimension,double learn)
         {
-            //儲存學習率
-            this.learn = learn;
+            
+            this.learn = learn;//儲存學習率
+            weightData = fc.WeightDataRead();//儲存各神經元權重
+            int wdPointer = 0;//weight data指標
 
             //建立每一層的神經元
             //建立輸入層神經元
             Perceptron[] pTemp;
             pTemp = new Perceptron[dimension];//輸入層神經元數等於輸入維度
-            int weightNum = dimension;//每一個神經元連接到上一層所需的連結數
+            int weightNum = dimension;//每一個神經元連接到上一層所需的連結數          
 
             //初始化輸入層神經元
             for (int j = 0; j < pTemp.Length; j++)
             {
                 pTemp[j] = new Perceptron();
-                pTemp[j].weightInit(weightNum + 1,learn);//多一維度是 w0 = 閥值
+                pTemp[j].weightInit(weightNum + 1,learn, weightData[wdPointer++]);//多一維度是 w0 = 閥值
             }
             mlp.Add(pTemp); //將初始成功的神經元放入mlp list
 
@@ -63,7 +52,7 @@ namespace MLP_PR
                 for(int j = 0; j < pTemp.Length; j++)
                 {
                     pTemp[j] = new Perceptron();
-                    pTemp[j].weightInit(weightNum+1, learn);//多一維度是 w0 = 閥值
+                    pTemp[j].weightInit(weightNum+1, learn, weightData[wdPointer++]);//多一維度是 w0 = 閥值
                 }
                 mlp.Add(pTemp); //將初始成功的神經元放入mlp list
             }
@@ -239,225 +228,33 @@ namespace MLP_PR
         }
         //--------------------------------------------------------------------------------------------------
 
-
-        /*
-
-
-
-
-
-
-
-
-    public double cal(double learnTemp,Perceptron[,] temp, List<Double> ex)
-    {
-        int count = 1;
-        int ctemp = 2;
-        while (ctemp < ex.Count)
+        //匯出WEIGHT DATA-----------------------------------------------------------------------------------
+        public void exportWeight()
         {
-            count++;
-            ctemp *= 2;
-        }
-        vT = new double[ex.Count,count + 1];
-        for (int i = 0; i < vT.Length; i++)
-        {
-            vT[i,0] = ex[i];
-            int x = i;
-            for (int j = count; j > 0; j--)
+            List<string> weightData = new List<string>();
+            String wString = "";
+            foreach (Perceptron[] p in mlp)
             {
-                if (x >= Math.Pow(2, j - 1))
+                for (int i = 0; i < p.Length; i++)
                 {
-                    x -= (int)Math.Pow(2, j - 1);
-                    vT[i,j] = 1;
-                }
-                else
-                {
-                    vT[i,j] = 0;
-                }
-            }
-
-        }
-
-
-        p = temp;
-        learn = learnTemp;
-        convergence = testc;
-
-        if (learn == 0)
-        {
-            learn = testl;
-        }
-
-
-        dataTrain = new double[data.Length / 3 * 2,data.GetLength(1) + 1];
-        dataTest = new double[data.Length - data.Length / 3 * 2,data.GetLength(1) + 1];
-        maxD = -100;
-        minD = 100;
-
-        for (int i = 0; i < dataTrain.Length; i++)
-        {
-            for (int j = 0; j < data.GetLength(1); j++)
-            {
-                dataTrain[i,0] = -1;
-                dataTrain[i,j + 1] = data[i,j];
-            }
-            if (dataTrain[i, data.GetLength(1) - 1] > maxD)
-            {
-                maxD = dataTrain[i, data.GetLength(1) - 1];
-                // System.out.println("max:"+dataTrain[i][dataTrain[i].length-1]);
-            }
-            if (dataTrain[i,data.GetLength(1) - 1] < minD)
-            {
-                minD = dataTrain[i,data.GetLength(1) - 1];
-                // System.out.println("min:"+
-                // dataTrain[i][dataTrain[i].length-1]);
-            }
-        }
-        for (int i = dataTrain.Length; i < data.GetLength(0); i++)
-        {
-            for (int j = 0; j < data.GetLength(1); j++)
-            {
-                dataTest[i - dataTrain.Length,0] = -1;
-                dataTest[i - dataTrain.Length,j + 1] = data[i,j];
-            }
-            if (dataTest[i - dataTrain.Length,dataTest.GetLength(1) - 1] > maxD)
-            {
-                maxD = dataTest[i - dataTrain.Length,dataTest.GetLength(1) - 1];
-                // System.out.println("max:"+maxD);
-            }
-            if (dataTest[i - dataTrain.Length,dataTrain.GetLength(1) - 1] < minD)
-            {
-                minD = dataTest[i - dataTrain.Length,dataTest.GetLength(1) - 1];
-                // System.out.println("max:"+minD);
-            }
-        }
-
-        // ªì©l¤Ænode
-        for (int i = 0; i < p.GetLength(1); i++)
-        {
-            p[p.GetLength(0) - 1,i].randomInit(dataTrain.GetLength(1) - 2);
-        }
-        for (int i = p.GetLength(0) - 2; i > -1; i--)
-        {
-            for (int j = 0; j < p.GetLength(1); j++)
-            {
-                p[i,j].randomInit(p.GetLength(1));
-            }
-        }
-
-        double e;
-        double s = 0;
-        rmse = 1000;
-        while (rmse > convergence && s < 10000)
-        {
-            rmse = 0;
-            s++;
-            for (int d = 0; d < dataTrain.Length; d++)
-            {
-
-                e = dataTrain[d][dataTrain[d].length - 1];
-                double[] eA = new double[vT[0].length];
-                for (int x = 0; x < vT.Length; x++)
-                {
-                    if (e == vT[x][0])
+                    wString = "";
+                    double[] weightTemp = p[i].getWeight();
+                    for (int j = 0; j < weightTemp.Length; j++)
                     {
-                        eA = vT[x];
-                        break;
-                    }
-                }
-
-                rmse += train(dataTrain[d], p.length - 1, eA);
-            }
-
-            rmse /= dataTrain.length;
-            System.out.println("s : " + s);
-            System.out.println("rmse : " + rmse);
-        }
-        double ans = test(dataTest);
-        System.out.println("rate: " + ans);
-        return ans;
-    }
-
-
-
-    public double test(double[][] input)
-    {
-        for (int i = 0; i < vT.length; i++)
-        {
-            for (int j = 0; j < vT[0].length; j++)
-            {
-                System.out.print(vT[i][j] + " ");
-            }
-            System.out.println();
-        }
-
-        double c = 0;
-        double idRate = 0;
-        double[] eTemp;
-        System.out.println("============================================");
-        for (int i = 0; i < input.length; i++)
-        {
-            eTemp = testWeight(input[i], p.length - 1);
-            //System.out.print("output : ");
-            for (int j = 1; j < eTemp.length; j++)
-            {
-                if (eTemp[j] > 0.5)
-                {
-                    eTemp[j] = 1;
-                }
-                else
-                {
-                    eTemp[j] = 0;
-                }
-                ///System.out.print(eTemp[j] + " ");
-
-            }
-            //System.out.println();
-            for (int v = 0; v < vT.length; v++)
-            {
-                for (int j = 1; j < eTemp.length; j++)
-                {
-                    //System.out.println(vT[v][j] + " " + eTemp[j]);
-                    if (eTemp[j] != vT[v][j])
-                    {
-                        break;
-                    }
-                    if (j == eTemp.length - 1)
-                    {
-                        if (vT[v][0] == input[i][input[i].length - 1])
+                        if (j == weightTemp.Length - 1)
                         {
-                            c++;
+                            wString += weightTemp[j];
+                        }else
+                        {
+                            wString += weightTemp[j] + " ";
                         }
                     }
-
+                    weightData.Add(wString);
                 }
             }
 
-            //System.out.println("ans : "+input[i][input[i].length - 1]);
-
+            fc.weightDataWrite(weightData);
         }
-        idRate = c / dataTest.length * 100;
-        return idRate;
-    }
-
-    public double[] testWeight(double[] input, int layer)
-    {
-        double[] nextInput = new double[p[layer].length + 1];
-        nextInput[0] = -1;
-        for (int i = 0; i < p[layer].length; i++)
-        {
-            // System.out.println("²Ä" + (layer) + "¼h,²Ä" + (i + 1) + "­Ó");
-            nextInput[i + 1] = p[layer][i].cal(input);
-        }
-        if (layer == 0)
-        {
-            return nextInput;
-        }
-        else
-        {
-            nextInput = testWeight(nextInput, layer - 1);
-        }
-        return nextInput;
-    }*/
+        //--------------------------------------------------------------------------------------------------
     }
 }
