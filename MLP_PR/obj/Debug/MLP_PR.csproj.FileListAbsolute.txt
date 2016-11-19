@@ -1,0 +1,6 @@
+C:\Users\JACK\.git\MLP_PR\MLP_PR\MLP_PR\bin\Debug\MLP_PR.exe.config
+C:\Users\JACK\.git\MLP_PR\MLP_PR\MLP_PR\bin\Debug\MLP_PR.exe
+C:\Users\JACK\.git\MLP_PR\MLP_PR\MLP_PR\bin\Debug\MLP_PR.pdb
+C:\Users\JACK\.git\MLP_PR\MLP_PR\MLP_PR\obj\Debug\MLP_PR.csprojResolveAssemblyReference.cache
+C:\Users\JACK\.git\MLP_PR\MLP_PR\MLP_PR\obj\Debug\MLP_PR.exe
+C:\Users\JACK\.git\MLP_PR\MLP_PR\MLP_PR\obj\Debug\MLP_PR.pdb
